@@ -1,0 +1,334 @@
+# Copyright 2021 The Province of British Columbia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-openshift-ingress
+spec:
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+  podSelector:
+    matchLabels:
+      role: frontend
+  policyTypes:
+    - Ingress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-emailservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # emailservice on the given port.
+  podSelector:
+    matchLabels:
+      role: emailservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-paymentservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # paymentservice on the given port.
+  podSelector:
+    matchLabels:
+      role: paymentservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 50051
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-shippingservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # shippingservice on the given port.
+  podSelector:
+    matchLabels:
+      role: shippingservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 50051
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-currencyservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # currencyservice on the given port.
+  podSelector:
+    matchLabels:
+      role: currencyservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 7000
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-productcatalogservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # productcatalogservice on the given port.
+  podSelector:
+    matchLabels:
+      role: productcatalogservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 3550
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-checkoutservice-to-cartservice
+spec:
+  # Allow the checkoutservice to talk to the
+  # cartservice on the given port.
+  podSelector:
+    matchLabels:
+      role: cartservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: checkoutservice
+      ports:
+        - protocol: TCP
+          port: 7070
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-recommendationservice-to-productcatalogservice
+spec:
+  # Allow the recommendationservice to talk to the
+  # productcatalogservice on the given port.
+  podSelector:
+    matchLabels:
+      role: productcatalogservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: recommendationservice
+      ports:
+        - protocol: TCP
+          port: 3550
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-productcatalogservice-to-redis-cart
+spec:
+  # Allow the cartservice to talk to the
+  # redis-cart on the given port.
+  podSelector:
+    matchLabels:
+      role: redis-cart
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: cartservice
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-productcatalogservice
+spec:
+  # Allow the frontend to talk to the
+  # productcatalogservice on the given port.
+  podSelector:
+    matchLabels:
+      role: productcatalogservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 3550
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-currencyservice
+spec:
+  # Allow the frontend to talk to the
+  # currencyservice on the given port.
+  podSelector:
+    matchLabels:
+      role: currencyservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 7000
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-cartservice
+spec:
+  # Allow the frontend to talk to the
+  # cartservice on the given port.
+  podSelector:
+    matchLabels:
+      role: cartservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 7070
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-recommendationservice
+spec:
+  # Allow the frontend to talk to the
+  # recommendationservice on the given port.
+  podSelector:
+    matchLabels:
+      role: recommendationservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-shippingservice
+spec:
+  # Allow the frontend to talk to the
+  # shippingservice on the given port.
+  podSelector:
+    matchLabels:
+      role: shippingservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 50051
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-checkoutservice
+spec:
+  # Allow the frontend to talk to the
+  # checkoutservice on the given port.
+  podSelector:
+    matchLabels:
+      role: checkoutservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 5050
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-frontend-to-adservice
+spec:
+  # Allow the frontend to talk to the
+  # adservice on the given port.
+  podSelector:
+    matchLabels:
+      role: adservice
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 9555
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-loadgen-to-frontend
+spec:
+  # Allow the loadgenerator to talk to the
+  # frontend on the given port.
+  podSelector:
+    matchLabels:
+      role: frontend
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: loadgenerator
+      ports:
+        - protocol: TCP
+          port: 8080
