@@ -6,6 +6,7 @@ You fill find useful docs on how to do things specific to the BCGov's implementa
 
 # Index
 
-1. [Network Policy Demo Project](./labs/netpol-demo-project);
-2. [Network Policy QuickStart](./labs/netpol-quickstart).
-
+1. [Network Policy Demo Project](./labs/netpol-demo-project)
+2. [Network Policy QuickStart](./labs/netpol-quickstart)
+3. [Crunchy DB High Availability Sample](./crunchydb/high-availablility/)
+4. [Crunchy DB Monitoring QuickStart](./crunchydb/monitoring/)
