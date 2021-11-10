@@ -70,7 +70,7 @@ oc -n LICENSE-tools create -f crunchy-monitoring.yaml
 
 ## Add monitoring sidecar to your PostgresCluster
 
-Edit your `PostgresCluster` to include the monitoring container as a sidecar
+Edit your `PostgresCluster` to include the monitoring container as a sidecar. Either directly with `oc edit` or edit your local kustomize files and then `oc intall -k`.
 
 ```yaml
 spec:
