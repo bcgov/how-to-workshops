@@ -80,7 +80,7 @@ spec:
         image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-5.0.3-0
 ```
 
-Add a `Role` and `RoleBinding` to allow access from your tools namespace where you installed the monitoring.
+Add a `Role` and `RoleBinding` to the namespace where your PGO cluster is to allow access from your tools namespace where you installed the monitoring.
 
 ```yaml
 ---
