@@ -2,6 +2,10 @@
 
 You can install one Crunchy Monitoring stack in a tools namespace and monitor all your PGO clusters. In these directions replace `LICENSE` with the license plate of your namespaces.
 
+## Prerequisite
+
+You will need to install [Kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/) to be able to build the manifests from Crunchy.
+
 ## Install monitoring stack
 
 Use this to install the Crunchy DB Monitoring stack into your tools namespace to monitor all your PGO instances.
