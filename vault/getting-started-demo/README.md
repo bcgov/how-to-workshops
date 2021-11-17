@@ -77,4 +77,4 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
 ## Support
 
-For information on Vault and for getting Vault support from the community check out `devops-vault` on RocketChat!
+For information on Vault and for getting Vault support from the community check out [#devops-vault](https://chat.developer.gov.bc.ca/channel/devops-vault) on RocketChat!
