@@ -60,8 +60,8 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
   Grab the pod name from `oc get pods`
 
-  ```bash
-  oc rsh -c vault vault-test-7c6cd9f45f-n4dnt 
+  ```console
+  $ oc rsh -c vault vault-test-7c6cd9f45f-n4dnt 
   $ cat /vault/secrets/helloworld
 
   world
