@@ -35,11 +35,10 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
   **Verify the Pod is up with `2/2` containers `READY`**
 
-  ```bash
-  oc get pods
+  ```console
+  $ oc get pods
   NAME                         READY   STATUS    RESTARTS   AGE
   vault-test-7c6cd9f45f-n4dnt   2/2    Running   0          1d
-  ```
 
   **Verify the Pod Logs are outputing `world`**
 
