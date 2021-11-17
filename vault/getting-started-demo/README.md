@@ -42,8 +42,8 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
   **Verify the Pod Logs are outputing `world`**
 
-  ```bash
-  oc logs deployment/vault-test -c vault
+  ```console
+  $ oc logs deployment/vault-test -c vault
   world
 
 
