@@ -8,6 +8,12 @@ This tool does not take into account that some image layers might be reused betw
 
 The script uses `oc`, `jq` and `numfmt` to do all its work. As long as those are installed and in the path it should work. Of course, you also need to be logged in and have read access to the image streams in your namespce.
 
+## Usage
+
+Make it executable `chmod +x ./registry-usage.sh`
+
+Run it with your tools namespace `./registry-usage.sh <namespace>`
+
 ## What are Revisions?
 
 When you push to a tag, a new revision is created with a new SHA. If you do a lot of builds in a short time, you might end up with a lot of revisions. There is a daily pruner job that runs that will keep only the most recent 3 revisions or any revisions created in the last 4 days.
