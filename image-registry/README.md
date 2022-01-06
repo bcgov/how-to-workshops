@@ -2,6 +2,8 @@
 
 Here is a bash script you can run to determine how much space in the Image Registry your namespace is using. It will list all the Images, Tags, and Revisions in the namespace and sum their sizes in a human readable form.
 
+This tool does not take into account that some image layers might be reused between tags/revisions and so may report a larger size than is actually stored on-disk in the registry. It is more intended to help understand what is contributing most to image registry usage.
+
 ## Prerequisites
 
 The script uses `oc`, `jq` and `numfmt` to do all its work. As long as those are installed and in the path it should work. Of course, you also need to be logged in and have read access to the image streams in your namespce.
