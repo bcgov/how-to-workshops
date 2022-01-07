@@ -8,6 +8,8 @@ This tool does not take into account that some image layers might be reused betw
 
 The script uses `oc`, `jq` and `numfmt` to do all its work. As long as those are installed and in the path it should work. Of course, you also need to be logged in and have read access to the image streams in your namespce.
 
+`numfmt` is available in the `coreutils` package on most OSs.
+
 ## Usage
 
 Make it executable `chmod +x ./registry-usage.sh`
