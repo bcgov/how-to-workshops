@@ -113,7 +113,7 @@ do
     for IMAGE in ${IMAGES}
     do
       # Get the size in bytes of the SHA
-      SIZE=$(oc get --raw=/apis/image.openshift.io/v1/images/${IMAGE} | jq -r '.dockerImageMetadata.Size')
+      SIZE=$(oc get --raw="/apis/image.openshift.io/v1/namespaces/${NS}/imagestreamimages/${IMAGESTREAM}@${IMAGE}" | jq -r '.image.dockerImageMetadata.Size')
       # Add to the accumulators
       TAGSIZE=$(( $TAGSIZE + $SIZE ))
       IMAGESIZE=$(( $IMAGESIZE + $SIZE ))
