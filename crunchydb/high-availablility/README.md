@@ -84,7 +84,7 @@ spec:
 
 #### S3
 
-* Add S3 credentials to `StorageSecret.yaml` 
+* Add S3 credentials to [StorageSecret.yaml](./StorageSecret.yaml)
 * If different repo $index then update keys accordingly and apply
 * Add below config to PostgresCluster.yaml
 
