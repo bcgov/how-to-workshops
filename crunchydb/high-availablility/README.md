@@ -61,6 +61,15 @@ spec:
           incremental: 0 */4 * * *
 ```
 
+### Four Storage Options
+
+* PVC
+* S3
+* Azure
+* GCS
+
+#### PVC
+
 Set the backups to go to a PVC that is [backed up](https://developer.gov.bc.ca/OCP4-Backup-and-Restore).
 
 ```yaml
@@ -71,4 +80,36 @@ spec:
       - name: repo1
         volume:
             storageClassName: netapp-file-backup
+```
+
+#### S3
+
+* Add S3 credentials to [StorageSecret.yaml](./StorageSecret.yaml)
+* If different repo $index then update keys accordingly and apply
+* Add below config to PostgresCluster.yaml
+
+```yaml
+spec:
+  backups:
+    pgbackrest:
+      configuration:
+      - secret:
+        name: hippo-ha-pgbackrest-secret
+      repos:
+      - name: repo1
+        s3:
+          bucket: <YOUR_S3_BUCKET>
+          region: us-west-1
+          endpoint: bc-data-obj.objectstore.gov.bc.ca
+```
+
+##### Note:
+
+Update below command and use it to spawn minio for verifying backups
+
+```bash
+docker run -it --rm -p 9000:9000 -p 9001:9001 --name minio-s3 \
+ -e "MINIO_ROOT_USER=<YOUR_S3_BUCKET_KEY>" \
+ -e "MINIO_ROOT_PASSWORD=<YOUR_S3_BUCKET_SECRET>" \
+ quay.io/minio/minio gateway s3 --console-address ":9001" https://bc-data-obj.objectstore.gov.bc.ca
 ```
