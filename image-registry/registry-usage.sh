@@ -90,8 +90,8 @@ TOTALSIZE=0
 # Loop through the ImageStreams
 for IMAGESTREAM in ${IMAGESTREAMS}
 do
-  # Initialize a size accumulator for this ImageStream
-  IMAGESIZE=0
+  # Initialize a dictionary of layers for this ImageStream
+  declare -A IMAGELAYERS=(['a']=0)
   echo "${IMAGESTREAM}:"
   # Get the raw json of the ImageStream
   ISJSON=$(oc get --raw=/apis/image.openshift.io/v1/namespaces/${NS}/imagestreams/${IMAGESTREAM})
@@ -100,8 +100,8 @@ do
   # Loop through the ImageStreamTags
   for TAG in ${TAGS}
   do
-    # Initialize a size accumulator for this ImageStreamTag
-    TAGSIZE=0
+    # Initialize a dictionary of layers for this ImageStreamTag
+    declare -A TAGLAYERS=(['a']=0)
     # If the image has no tags, break out
     [[ -z "${TAG}" ]] && break
     echo "  ${TAG}:"
@@ -113,21 +113,42 @@ do
     for IMAGE in ${IMAGES}
     do
       # Get the size in bytes of the SHA
-      SIZE=$(oc get --raw="/apis/image.openshift.io/v1/namespaces/${NS}/imagestreamimages/${IMAGESTREAM}@${IMAGE}" | jq -r '.image.dockerImageMetadata.Size')
-      # Add to the accumulators
-      TAGSIZE=$(( $TAGSIZE + $SIZE ))
-      IMAGESIZE=$(( $IMAGESIZE + $SIZE ))
-      TOTALSIZE=$(( $TOTALSIZE + $SIZE ))
+      ISTJSON=$(oc get --raw="/apis/image.openshift.io/v1/namespaces/${NS}/imagestreamimages/${IMAGESTREAM}@${IMAGE}")
+      # Get the size of the SHA
+      SIZE=$(echo "${ISTJSON}" | jq -r '.image.dockerImageMetadata.Size')
       # Format and print
       SIZEFMT=$(numfmt --to=iec-i --suffix=B ${SIZE})
       echo "    ${IMAGE}: ${SIZEFMT}"
+      while read -r LAYER LAYERSIZE;
+      do
+        TAGLAYERS[$LAYER]="${LAYERSIZE}"
+        IMAGELAYERS[$LAYER]="${LAYERSIZE}"
+      done < <(echo "${ISTJSON}" | jq -r '.image.dockerImageLayers[]|.name + " " + (.size|tostring)')
     done
+    TAGSIZE=0
+    for i in "${TAGLAYERS[@]}"
+    do
+      TAGSIZE=$(( $TAGSIZE + $i ))
+    done
+    unset TAGLAYERS
     TAGSIZEFMT=$(numfmt --to=iec-i --suffix=B ${TAGSIZE})
     echo  "    Tag Total: ${TAGSIZEFMT}"
   done
+  IMAGESIZE=0
+  for i in ${IMAGELAYERS[@]}
+  do
+    IMAGESIZE=$(( $IMAGESIZE + $i ))
+  done
+  for i in "${!IMAGELAYERS[@]}"
+  do
+    echo "$i ${IMAGELAYERS[$i]}"
+  done
+  unset IMAGELAYERS
+  TOTALSIZE=$(( $TOTALSIZE + $IMAGESIZE ))
   IMAGESIZEFMT=$(numfmt --to=iec-i --suffix=B ${IMAGESIZE})
   echo "  Image Total: ${IMAGESIZEFMT}"
 done
 TOTALSIZEFMT=$(numfmt --to=iec-i --suffix=B ${TOTALSIZE})
 echo "======================="
 echo "Namespace Total: ${TOTALSIZEFMT}"
+echo "======================="
