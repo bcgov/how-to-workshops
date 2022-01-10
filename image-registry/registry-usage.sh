@@ -31,19 +31,19 @@ bash_backtrace() {
     # an error in the middle of a command
     exec 1>&3 2>&4
 
-    error "Traceback (most recent call last):"
+    echo "Traceback (most recent call last):"
 
     for ((FRAME=FRAMES-2; FRAME >= 0; FRAME--)); do
         local LINENO=${BASH_LINENO[FRAME]}
 
         # Location of error
-        error "  File ${BASH_SOURCE[FRAME+1]}, line ${LINENO}, in ${FUNCNAME[FRAME+1]}"
+        echo "  File ${BASH_SOURCE[FRAME+1]}, line ${LINENO}, in ${FUNCNAME[FRAME+1]}"
 
         # Print the error line, with preceding whitespace removed
-        error "$(sed -n "${LINENO}s/^[   ]*/    /p" "${BASH_SOURCE[FRAME+1]}")"
+        echo "$(sed -n "${LINENO}s/^[   ]*/    /p" "${BASH_SOURCE[FRAME+1]}")"
     done
 
-    error "Exiting with status ${RET}"
+    echo "Exiting with status ${RET}"
     exit "${RET}"
 }
 
