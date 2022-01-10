@@ -108,7 +108,7 @@ do
     # Parse out the image SHAs in this tag stream
     # Each push to a tag will upload a new SHA
     # The image pruner will keep the most recent 4 days or 3 SHAs
-    IMAGES=$(echo "${ISJSON}" | jq -r '.status.tags[]|select(.tag == "'"${TAG}"'")|.items[]|.image')
+    IMAGES=$(echo "${ISJSON}" | jq -r '.status.tags[]|select(.tag == "'"${TAG}"'")|.items[]?|.image')
     # Loop through the SHAs
     for IMAGE in ${IMAGES}
     do
