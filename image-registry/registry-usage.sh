@@ -139,10 +139,6 @@ do
   do
     IMAGESIZE=$(( $IMAGESIZE + $i ))
   done
-  for i in "${!IMAGELAYERS[@]}"
-  do
-    echo "$i ${IMAGELAYERS[$i]}"
-  done
   unset IMAGELAYERS
   TOTALSIZE=$(( $TOTALSIZE + $IMAGESIZE ))
   IMAGESIZEFMT=$(numfmt --to=iec-i --suffix=B ${IMAGESIZE})
