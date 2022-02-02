@@ -10,7 +10,7 @@ This lab contains the quick start material that will get your environment up and
 
 # Prologue
 
- Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. Openshift 4 Build-In Software Defined Network (SDN) has been implemented to control network security for all apps hosted on the Private Cloud Openshift Platform. 
+ Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. Openshift 4 Built-In Software Defined Network (SDN) has been implemented to control network security for all apps hosted on the Private Cloud Openshift Platform. 
 
 # Introduction
 
