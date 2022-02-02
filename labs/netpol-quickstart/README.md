@@ -33,7 +33,7 @@ Projects that require cross-namespace communication should reach out to the Plat
 
 As product teams implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected. 
 
-One a KNP is installed in every namespaces provisioned by the Platform Project Registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later.
+One KNP  is installed by default in every namespaces provisioned by the Platform Project Registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later. This "deny-all" KNP enforces the Zero Trust model within the namespace and blocks all communications from and within the namespace.
 
 ```console
 ➜  how-to-workshops git:(master) ✗ oc get netpol
