@@ -28,7 +28,7 @@ With the quick start KNP in place pods will be able to connect to other pods wit
 
 Without egress policy, pods that need to communicate **between namespaces** only require ingress rules on the destination pod to permit the inbound communication. This is fine is most circumstances because you will have a *deny-by-default* rule guarding all your namespaces.
 
-High security projects that require egress rules to a specific namespace should reach out to Platform Services; these policies can be implemented, as needed, by a cluster administrator.
+Projects that require cross-namespace communication should reach out to the Platform Services Teams in Rocketchat ; these policies can be implemented, as needed, by a cluster administrator.
 
 ### Roll Out
 
