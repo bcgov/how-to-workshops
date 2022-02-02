@@ -1,6 +1,6 @@
-# TL;DR
+## Getting started with Kubernetes Network Policies on Private Cloud Openshift Platform
 
-In April 2020 we removed Aporeto from the Silver cluster and went all in on Kubernetes Network Policy (KNP). This lab contains the quick start material that will get your environment up and running with the new KNP.
+This lab contains the quick start material that will get your environment up and running with the KNP.
 
 * [OpenShift SDN](https://docs.openshift.com/container-platform/4.6/networking/openshift_sdn/about-openshift-sdn.html)
 
@@ -10,20 +10,13 @@ In April 2020 we removed Aporeto from the Silver cluster and went all in on Kube
 
 # Prologue
 
- Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. One of these tools, Aporeto, was chosen as a Software Defined Network solution to control network security for Platform app. Aporeto has been selected over Openshift 4 Built-In SDN capability powered by Kubernetes Network Policy (KNP), because it offered a way to extend security policies outside of OpenShift into other systems that are based on the traditional infrastructure such as databases hosted in Zone B. This would have enabled teams to secure connections between their apps running in the OpenShift Platform and data sources hosted inside the Zone B network zone. 
-
-While Aporeto provided a great developer experience and the functionality that met our needs very well, we ran into some issues with running it on top of our specific OpenShift implementation and thus, the decision to pivot to OCP 4 Built-In SDN. Some might say this was a failure, but in reality, learning new information and acting on it is a success. Learning new information and doing nothing would certainly be a failure.
-
-**Takeaway 🧐**
-- Aporeto and Kubernetes NetworkPolicy have a fairly comparable impact from the end-user’s (platform tenant) perspective. The main difference is that Aporeto could be extended to external systems where as KNP only applies to OCP. We are actively looking into the workarounds for the teams that need to secure integrations between their OpenShift applications and Zone B components and expect to finalize the list of options in April 2021.
+ Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. Openshift 4 Built-In Software Defined Network (SDN) has been implemented to control network security for all apps hosted on the Private Cloud Openshift Platform. 
 
 # Introduction
 
-This guide will walk you through implementing the quick start Network Policy (KNP). While this will be enough to your project up-and-running we **strongly** recommend rolling out more robust NP to ensure your environment(s) are as secure as they can be. Further workshops will expand on this subject. 
+Developers interact with the Openshift 4 Build-In SDN through the use of Kubernetes Network Policies (KNPs) objects that allow to specify network security rule declaratively within each namespace and down to the pod level. **All projects first provisioned on the Platform have "Zero-Trust" network security enabled by default** which means that all communications from and within the project namespaces are shutdown except for those that are explicitely allows in the KNPs.  This guide will walk you through implementing the quick start Network Policy (KNP) to unblock basic communications within a namespace. While this will be enough to your project up-and-running we **strongly** recommend rolling out more robust NPs to ensure your environment(s) are as secure as they can be. Further workshops will expand on this subject. 
 
-The current version of the OpenShift (v4.6) on the platform does not support all features outlined in the [Kubernetes NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) documentation. The main differences as noted in the [OpenShift SDN](https://docs.openshift.com/container-platform/4.5/networking/openshift_sdn/about-openshift-sdn.html) documentation are that egress rules and some ipBlock rules are currently not supported; we expect these features to be delivered with OpenShift 4.8 later this fall.
-
-If you need egress rules to limit what your pods can communicate with contact Platform Services (PS) in #devops-how-to RocketChat channel. We can help implement this type of policy.
+Read more about [the KNPs features](https://docs.openshift.com/container-platform/4.8/networking/network_policy/about-network-policy.html) supported in the current version of the OpenShift (v4.8) on the Platform. Note that the support for egress rules and ipBlock rules have only become available in OCP 4.8.
 
 # Getting Started
 
@@ -31,17 +24,16 @@ Before we dive into the quick start policies, lets go over a few important detai
 
 ### Egress Rules
 
-With the quick start KNP in place pods will be able to connect to other pods within their namespace, in other namespaces, or to external systems (outside of the cluster). This is because egress rules are not available to tenants (project teams) just yet. This type of policy is available in OCP v4.6 but there isn't a migration path to them until OCP v4.8 which is expected in June of this year (2021). 
+With the quick start KNP in place pods will be able to connect to other pods within their namespace, in other namespaces, or to external systems (outside of the cluster). 
 
-Without egress policy, pods that need to communicate **between namespaces** only require ingress rules on the destination pod to permit the inbound communication. This is fine is most circumstances because you will have a *deny-by-default* rule guarding all your namespaces.
 
-High security projects that require egress rules to isolated a namespace should reach out to Platform Services; these policies can be implemented, as needed, by a cluster administrator.
+Projects that require cross-namespace communication should reach out to the Platform Services Teams in Rocketchat ; these policies can be implemented, as needed, by a cluster administrator.
 
-### Roll Out
+### Default Zero-Trust KNP
 
-As platform tenants implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected. 
+As product teams implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected. 
 
-One KNP is installed in every namespaces provisioned by the registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later.
+One KNP  is installed by default in every namespaces provisioned by the Platform Project Registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later. This "deny-all" KNP enforces the Zero Trust model within the namespace and blocks all communications from and within the namespace.
 
 ```console
 ➜  how-to-workshops git:(master) ✗ oc get netpol
@@ -103,7 +95,7 @@ Having a route alone isn't enough to let traffic flow into your pods, you also n
 ```
 
 **Pro Tip 🤓**
-- Add labels to your KNP to easily find and delete them as a group.
+- Add labels to your KNP to easily find and delete them as a group. Check out [this sample application](https://github.com/bcgov/how-to-workshops/blob/master/labs/netpol-demo-project) that demonstrates the use of labels to make it easier to apply KNPs to the selected pods.
 - `podSelector: {}` is a wildcard, if you want additional piece of mind add a label like `route-ingress: true` to pods that can accept external traffic and use it in place of the wildcard.
 
 ### Any to Any
