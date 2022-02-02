@@ -29,7 +29,7 @@ With the quick start KNP in place pods will be able to connect to other pods wit
 
 Projects that require cross-namespace communication should reach out to the Platform Services Teams in Rocketchat ; these policies can be implemented, as needed, by a cluster administrator.
 
-### Roll Out
+### Default Zero-Trust KNP
 
 As product teams implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected. 
 
