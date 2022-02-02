@@ -1,4 +1,4 @@
-Getting started with Kubernetes Network Policies In Openshift
+## Getting started with Kubernetes Network Policies on Private Cloud Openshift Platform
 
 This lab contains the quick start material that will get your environment up and running with the KNP.
 
