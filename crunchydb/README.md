@@ -6,7 +6,7 @@ Docs for Cruncy DB can be found [here](https://access.crunchydata.com/documentat
 
 ## Upgrading / Patching
 
-To upgrade your PGO cluster, simply update the `image:` references to the new image names and the operator will take care of the rest. See the [docs](https://access.crunchydata.com/documentation/postgres-operator/5.0.3/tutorial/update-cluster/) for more details.
+To upgrade your PGO cluster, simply update the `image:` references to the new image names and the operator will take care of the rest. See the [docs](https://access.crunchydata.com/documentation/postgres-operator/5.0.4/tutorial/update-cluster/) for more details.
 
 For the community version, subscribe to the mailing list [pgsql-announce](https://lists.postgresql.org/manage/) to find out about updates. If we upgrade to the enterprise version the platform team will be notified of updates and announce them to the teams using the operator.
 
