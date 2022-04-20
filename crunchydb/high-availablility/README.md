@@ -57,8 +57,10 @@ spec:
       repos:
       - name: repo1
         schedules:
-          full: 0 1 * * *
-          incremental: 0 */4 * * *
+          # Full backup every day at 8:00am UTC
+          full: "0 8 * * *"
+          # Incremental backup every 4 hours, except at 8am UTC (when the full backup is running)
+          incremental: "0 0,4,12,16,20 * * *"
 ```
 
 ### Four Storage Options
