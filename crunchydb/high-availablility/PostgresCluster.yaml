@@ -5,13 +5,39 @@ metadata:
 spec:
   monitoring:
     pgmonitor:
+      # this stuff is for the "exporter" container in the "hippo-ha-pgha1" set of pods
       exporter:
         image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-5.0.4-0
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:centos8-13.5-0
   postgresVersion: 13
   instances:
     - name: pgha1
       replicas: 3
+      # these resources are for the "database" container in the "hippo-ha-pgha1" set of pods
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 512Mi
+      sidecars:
+        # this stuff is for the "replication-cert-copy" container in the "hippo-ha-pgha1" set of pods
+        replicaCertCopy:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
       dataVolumeClaimSpec:
         accessModes:
         - "ReadWriteOnce"
@@ -49,6 +75,35 @@ spec:
               requests:
                 storage: 1Gi
             storageClassName: netapp-file-backup
+      # this stuff is for the "pgbackrest" container (the only non-init container) in the "hippo-ha-repo-host" pod
+      repoHost:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+      sidecars:
+        # this stuff is for the "pgbackrest" container in the "hippo-ha-pgha1" set of pods
+        pgbackrest:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        # these are the hilariously low params I stole from Alec on RC! 
+        # these will probably allow your database to start up, but you'll definitely want to tune
+        parameters:
+          shared_buffers: '16MB' # default is 128MB; a good tuned default for shared_buffers is 25% of the memory allocated to the pod
+          wal_buffers: '-1' # automatically set as 1/32 of shared_buffers or 64kB, whichever is larger
+          min_wal_size: '32MB'
+          max_wal_size: '128MB' # default is 1GB
   proxy:
     pgBouncer:
       config:
@@ -56,6 +111,15 @@ spec:
           client_tls_sslmode: disable
       image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbouncer:centos8-1.15-3
       replicas: 2
+      # these resources are for the "pgbouncer" container in the "hippo-ha-pgbouncer" set of pods
+      # there is a sidecar in these pods which are not mentioned here, but the requests/limits are teeny weeny by default so no worries there.
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 256Mi
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
