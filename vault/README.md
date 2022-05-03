@@ -26,9 +26,7 @@ When you look at the getting-started-demo you'll see there's already a deploymen
     serviceaccount
 
 ## Annotation
-TODO: find link to Hashicorp pages that speak of the different ways to use the vault.  We've selected the annotation method:
-
-We elected to use the annotation / sidecar method.
+We elected to use the annotation / sidecar method. [This was helpful from Hashicorp](https://www.vaultproject.io/docs/platform/k8s/injector/examples).
 
 Note: learn from my mistake in the Deployment. Place the annotation in the correct location. In the "Deployment" it belongs in the template category of course:
 
