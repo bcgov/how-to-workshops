@@ -76,6 +76,7 @@ spec:
       serviceAccount: {{ .Values.global.licenseplate }}-vault
   ```
 
+
 Note the additional line under spec that I added. This is the service account that is needed to connect to the Vault. This account has been created already for you so on the surface it's straight forward. You may notice two another one that's used:
 ```        serviceAccountName: LICENSE-vault```
 I believe the serviceAccountName is used for Openshift and ServiceAccount is used by Kubernetes.  I've yet to determine the differences or why there is a difference, but in anycase, using ServiceAccount did the trick for me while using Deployments.  This is more the Kubernetes way of doing things than the Openshift method which I've seen use DeploymentConfigs and possibly that's where serviceAccountName comes into play.
