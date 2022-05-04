@@ -14,11 +14,32 @@ Role: {LicensePlate}  (eg: abc123) (Note: No need for the dev/test/prod suffix)
 
 It will then prompt you to authorize with your Github account.
 
-*** TODO: ADAM
- - add details as to how to use Vault to add secrets.
- - Provide an example of the way we did it with nonprod and prod
- - speak to the challenges we had around dev/test/tools all in nonprod (same var name different value)
- - speak to how we weren't able to separate dev/test into sub catagories like we wanted eg: /nonprod/dev/variable, /nonprod/test/variable
+It will then prompt you to authorize with your Github account.
+
+Once you've authenticated to your vault you will see 3 secret engines. {LicensePlate}-nonprod, {LicensePlate}-prod and cubbyhole. Your prod namespace his its own secret engine, while your tools, dev and test namespaces will share the nonprod secret engine as the naming suggests. The cubbyhole secret engine was not used in our environment. 
+
+We organized our secrets as follows:
+
+{LicensePlate}-nonprod                #secret engine
+- |---cmf-microservices-dev             #secret name
+-     |---dev_database_host             #secret data
+-     |---dev_datebase_name             #secret data    
+-     |---dev_service_account           #secret data
+-     |---dev_service_account_pass      #secret data
+- |---cmf-microservices-test            #secret name
+-     |---test_database_host            #secret data
+-     |---test_datebase_name            #secret data    
+-     |---test_service_account          #secret data
+-     |---test_service_account_pass     #secret data
+
+{LicensePlate}-prod                   #secret engine
+- |---cmf-microservices-prod            #secret name
+-     |---prod_database_host            #secret data
+-     |---prod_datebase_name            #secret data
+-     |---prod_service_account          #secret data
+-     |---prod_service_account_pass     #secret data
+
+As of the time of writing, users do not have permissions to create additional secret engines. You must therefore organize your secrets into the pre-allocated secret engines. This constraint may cause issues if your secrets have the same name throughout the different namespaces.
 
 TODO: a note to incorporate somewhere.  Don't use a hyphen in a "key".  Vault will accept the value but it's problematic in the openshift templates which shows up as an error in the vault-init container.
 
