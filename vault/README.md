@@ -20,6 +20,12 @@ It will then prompt you to authorize with your Github account.
  - speak to the challenges we had around dev/test/tools all in nonprod (same var name different value)
  - speak to how we weren't able to separate dev/test into sub catagories like we wanted eg: /nonprod/dev/variable, /nonprod/test/variable
 
+I've had questions about the DevExchange Vault service and ownership/permissions.  I can't say I have all the details, but what I've been able to gether is that whomever is the "owner" of the Openshift environment is generally also the "technical contact".  This same person (or persons) are also owner(s) of the Vault.  This is typically the person who requested the OC4 "Project Set" (a project set is the OC4 dev/test/prod/tools namespaces).  Within the Vault service the only people who are able to grant additional permissions is the DevExchange team.  The owner does not have rights to alter roles.  Best method to get additional technical resources (eg: Devops Engineers) is to ask the owner to post a request in the [#devops-vault RocketChat channel](https://chat.developer.gov.bc.ca/channel/devops-vault).
+
+
+TODO: a note to incorporate somewhere.  Don't use a hyphen in a "key".  Vault will accept the value but it's problematic in the openshift templates which shows up as an error in the vault-init container.
+
+
 # Usage of the Vault secrets in Openshift.
 When you look at the getting-started-demo you'll see there's already a deployment template the assist. The two important parts of this vault demp are:
     annotations
