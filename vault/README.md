@@ -21,16 +21,16 @@ Once you've authenticated to your vault you will see 3 secret engines. {LicenseP
 We organized our secrets as follows:
 
 {LicensePlate}-nonprod                #secret engine
-> |---cmf-microservices-dev             #secret name
->     |---dev_database_host             #secret data
+> |---cmf-microservices-dev             #secret name  
+>     |---dev_database_host             #secret data  
 >     |---dev_datebase_name             #secret data    
->     |---dev_service_account           #secret data
->     |---dev_service_account_pass      #secret data
-> |---cmf-microservices-test            #secret name
->     |---test_database_host            #secret data
->     |---test_datebase_name            #secret data    
->     |---test_service_account          #secret data
->     |---test_service_account_pass     #secret data
+>     |---dev_service_account           #secret data  
+>     |---dev_service_account_pass      #secret data  
+> |---cmf-microservices-test            #secret name  
+>     |---test_database_host            #secret data  
+>     |---test_datebase_name            #secret data     
+>     |---test_service_account          #secret data  
+>     |---test_service_account_pass     #secret data  
 
 {LicensePlate}-prod                   #secret engine
 > |---cmf-microservices-prod            #secret name
