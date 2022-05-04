@@ -2,15 +2,15 @@
 
 The DevExchange group provisions a Hashicorp Vault for each Openshift (OC4) Project Set (licensepate-dev/test/prod/tools - eg: abc123-dev, abc123-test, abc123-prod, abc123-tools).
 
-To start, you need to have permissions to use the Vault. What we've been able to gather is that whomever is the "owner" of the Openshift environment is generally also the "technical contact". This same person (or persons) are also owner(s) of the Vault. This is typically the person who requested the OC4 Project Set.  Within the Vault service the only people who are able to grant additional permissions is the DevExchange team. The owner does not have rights to alter roles. Best method to get additional technical resources (eg: Devops Engineers) is to ask the owner to post a request in the [#devops-vault RocketChat channel](https://chat.developer.gov.bc.ca/channel/devops-vault). As of the time of writing, users do not have permissions to create additional secret engines. You must therefore organize your secrets into the pre-allocated secret engines. This constraint may cause issues if your secrets have the same name throughout the different namespaces.
+To start, you need to have permissions to use the Vault. Two users, the "Product Owner" and the "Tech Lead", are assigned during the [creation of the Openshift Project Set](https://registry.developer.gov.bc.ca/). These same users are granted admin permissions of the licenseplate Vault. Within the Vault service the only people who are able to grant additional permissions is the DevExchange team. Neither the Product Owner nor the Tech Lean have rights to alter roles. Best method to get additional technical resources (eg: Devops Engineers) is to ask the owner to post a request in the [#devops-vault RocketChat channel](https://chat.developer.gov.bc.ca/channel/devops-vault). As of the time of writing, users do not have permissions to create additional secret engines. You must therefore organize your secrets into the pre-allocated secret engines. This constraint may cause issues if your secrets have the same name throughout the different namespaces.
 
-To log into the vault start here:
-[https://vault.developer.gov.bc.ca/](https://vault.developer.gov.bc.ca/)
+To log into the vault start here: [https://vault.developer.gov.bc.ca/](https://vault.developer.gov.bc.ca/)
 
 To log in use the following values:
-Namespace: platform-services
-Method: OIDC
-Role: {LicensePlate}  (eg: abc123) (Note: No need for the dev/test/prod suffix)
+
+- Namespace: platform-services
+- Method: OIDC
+- Role: {LicensePlate}  (eg: abc123) (Note: No need for the dev/test/prod suffix)
 
 It will then prompt you to authorize with your Github account.
 
@@ -47,16 +47,17 @@ We organized our secrets as follows:
 Note: Don't use a hyphen in a "key".  Vault will accept the value but it's problematic in the Openshift templates which shows up as an error in the vault-init container.
 
 # Usage of the Vault secrets in Openshift.
+
 When you look at the getting-started-demo you'll see there's already a deployment template to assist. The two important parts of this vault demo are:
-    annotations
-    serviceaccount
+- `annotations`
+- `serviceaccount`
 
 ## Annotation
 We elected to use the annotation / sidecar method. [This was helpful from Hashicorp](https://www.vaultproject.io/docs/platform/k8s/injector/examples).
 
 Note: Learn from my mistake in the Deployment. Place the annotation in the correct location. In the "Deployment" it belongs in the "metadata" portion of "template" NOT the root metadata section:
 
-```
+```yaml
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -97,14 +98,12 @@ spec:
           export dev_toolbox="{{ .Data.data.dev_toolbox }}"
           {{- end `}} }}
     spec:
-      serviceAccount: abc123-vault
+      serviceAccountName: abc123-vault
       # or for HELM with var replacements use:
-      #serviceAccount: {{ .Values.global.licenseplate }}-vault
+      #serviceAccountName: {{ .Values.global.licenseplate }}-vault
 
   ```
 
-Note the additional line under spec that I added. This is the service account that is needed to connect to the Vault. This account has been created already for you in Openshift so on the surface it's straight forward. You may notice another one that's used in the demo:
-```        serviceAccountName: LICENSE-vault```
-I believe the serviceAccountName is used for Openshift and ServiceAccount is used by Kubernetes. I've yet to determine the differences or why there is a difference, but in any case, using ServiceAccount did the trick for me while using Deployments. Having both did not hurt. This is more the Kubernetes way of doing things than the Openshift method which I've seen uses DeploymentConfigs and possibly that's where serviceAccountName comes into play?
+Note the additional line under spec that I added. This is the service account that is needed to connect to the Vault. This account has been created already for you in Openshift so on the surface it's straight forward. You may notice another one that's used in the demo: `serviceAccount: LICENSE-vault`. According to `oc explain pod.spec.serviceAccount` serviceAccount has been deprecated.
 
 There's a issue to be aware of with using this service account. In my case I use Imagestreams from the {licenseplate}-tools namespace which means I need to have a service account that's allowed to read from the image stream between namespaces (eg: between abc123-dev and abc123-tools). Originally I'd set the "deployer" account with the permissions to do this by adding the vault secrets to the deployer SA, but for some reason it didn't work. What did work was using the {licenseplate}-vault service account (abc123-vault). It already had permissions to read from the tools namespace. Perhaps not optimal, but it worked.
