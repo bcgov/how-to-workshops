@@ -4,6 +4,7 @@ The DevExchange group provisions a Hashicorp Vault for each Openshift (OC4) Proj
 
 To start, you need to have permissions to use the Vault. Two users, the "Product Owner" and the "Tech Lead", are assigned during the [creation of the Openshift Project Set](https://registry.developer.gov.bc.ca/). These same users are granted admin permissions of the licenseplate Vault. Within the Vault service the only people who are able to grant additional permissions is the DevExchange team. Neither the Product Owner nor the Tech Lean have rights to alter roles. Best method to get additional technical resources (eg: Devops Engineers) is to ask the owner to post a request in the [#devops-vault RocketChat channel](https://chat.developer.gov.bc.ca/channel/devops-vault). As of the time of writing, users do not have permissions to create additional secret engines. You must therefore organize your secrets into the pre-allocated secret engines. This constraint may cause issues if your secrets have the same name throughout the different namespaces.
 
+[This wiki](https://github.com/BCDevOps/openshift-wiki/blob/master/docs/Vault/VaultGettingStarted.md) will help with getting you started on the Vault service side.  There's more CLI on that page which can be very useful for diag and any automation you wish to incorporate.
 To log into the vault start here: [https://vault.developer.gov.bc.ca/](https://vault.developer.gov.bc.ca/)
 
 To log in use the following values:
