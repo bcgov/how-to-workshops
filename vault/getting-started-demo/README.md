@@ -76,7 +76,7 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
 ## Advanced usages
 
-You can use Vault injector annotations to further configure the sidecar container specs. For example, you tune the resource specification with annotations like `vault.hashicorp.com/agent-limits-cpu: 1`. Here is the full list of injector annotations: https://www.vaultproject.io/docs/platform/k8s/injector/annotations#annotations.
+You can use Vault injector annotations to further configure the sidecar container specs. For example, you tune the resource specification with annotations like `vault.hashicorp.com/agent-limits-cpu: 10m`. Here is the full list of injector annotations: https://www.vaultproject.io/docs/platform/k8s/injector/annotations#annotations.
 
 
 ## Support
