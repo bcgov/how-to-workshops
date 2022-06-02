@@ -6,7 +6,7 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
 ## Generating Deployment Manifests for Testing
 
-1. Set Required Environemnt Variables
+1. Set Required Environment Variables
 
     ```bash
     export LICENSE_PLATE=<your license plate here>
@@ -40,7 +40,7 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
   NAME                         READY   STATUS    RESTARTS   AGE
   vault-test-7c6cd9f45f-n4dnt   2/2    Running   0          1d
 
-  **Verify the Pod Logs are outputing `world`**
+  **Verify the Pod Logs are outputting `world`**
 
   ```console
   $ oc logs deployment/vault-test -c vault
@@ -73,6 +73,11 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
   `oc delete -f vault-$LICENSE_PLATE-$ENV`
 
   Assuming your logs look similar to those shown above your project set is configured and setup for integrating Vault with your Applications! :tada:
+
+## Advanced usages
+
+You can use Vault injector annotations to further configure the sidecar container specs. For example, you tune the resource specification with annotations like `vault.hashicorp.com/agent-limits-cpu: 10m`. Here is the full list of injector annotations: https://www.vaultproject.io/docs/platform/k8s/injector/annotations#annotations.
+
 
 ## Support
 
