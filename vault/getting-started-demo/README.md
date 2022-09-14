@@ -9,7 +9,7 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 1. Set Required Environment Variables
 
     ```bash
-    export LICENSE_PLATE=<your license plate here>
+    export LICENSE_PLATE=<your project set license plate here>
     export CLUSTER_NAME=silver #gold, and golddr are also supported options
     ```
 
@@ -31,14 +31,13 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
   `oc apply -f vault-$LICENSE_PLATE-$ENV`
 
-  > **Note:** It is recommended to start with the tools
-
-  **Verify the Pod is up with `2/2` containers `READY`**
+  > **Note:** It is recommended to start with the tools. Once the pod is up, you would see an init container called `vault-agent-init` that authenticate and pull the secret from Vault server for your app container(s).
 
   ```console
   $ oc get pods
   NAME                         READY   STATUS    RESTARTS   AGE
-  vault-test-7c6cd9f45f-n4dnt   2/2    Running   0          1d
+  vault-test-7c6cd9f45f-n4dnt   1/1    Running   0          1d
+  ```
 
   **Verify the Pod Logs are outputting `world`**
 
@@ -76,7 +75,7 @@ This demo is intended for BCGov Development Teams on the OpenShift Silver or Gol
 
 ## Advanced usages
 
-You can use Vault injector annotations to further configure the sidecar container specs. For example, you tune the resource specification with annotations like `vault.hashicorp.com/agent-limits-cpu: 10m`. Here is the full list of injector annotations: https://www.vaultproject.io/docs/platform/k8s/injector/annotations#annotations.
+You can use Vault injector annotations to further configure the sidecar container specs. For example, you tune the resource specification with annotations like `vault.hashicorp.com/agent-limits-cpu: 10m`. Here is the full list of [injector annotations](https://www.vaultproject.io/docs/platform/k8s/injector/annotations#annotations).
 
 
 ## Support
