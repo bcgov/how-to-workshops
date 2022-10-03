@@ -55,7 +55,7 @@ When you look at the getting-started-demo you'll see there's already a deploymen
 - `serviceaccount`
 
 ## Annotation
-We elected to use the annotation / sidecar method. [This was helpful from Hashicorp](https://www.vaultproject.io/docs/platform/k8s/injector/examples).
+We elected to use the annotation / Vault Agent Injector method. [This was helpful from Hashicorp](https://www.vaultproject.io/docs/platform/k8s/injector/examples).
 
 In the following example, it contains the minimum configuration needed for Vault init container to work. If you are looking for advanced configurations, such as vault init container resource config and so on, options can be found from the [annotation doc](https://www.vaultproject.io/docs/platform/k8s/injector/annotations)!
 
@@ -80,26 +80,26 @@ spec:
       labels:
         app: myapp
       annotations:
-        # Vault sidecar code goes here, inside the template.
+        # 1. Vault injector configuration goes here, inside the template.
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-inject-token: 'true'
-        # this makes sure the secret vault will only change during pod restart:
-        vault.hashicorp.com/agent-pre-populate-only: 'true'
-        vault.hashicorp.com/auth-path: auth/k8s-gold  # This was tricky.  Be sure to use k8s-silver, k8s-gold, or k8s-golddr
+        vault.hashicorp.com/agent-pre-populate-only: 'true' # this makes sure the secret vault will only change during pod restart
+        vault.hashicorp.com/auth-path: auth/k8s-silver  # This was tricky.  Be sure to use k8s-silver, k8s-gold, or k8s-golddr
         vault.hashicorp.com/namespace: platform-services
         vault.hashicorp.com/role: abc123-nonprod  # licenseplate-nonprod or licenseplate-prod are your options
-        # Configures Vault Agent to retrieve the secrets from Vault:
+
+        # Configure how to retrieve and populate the secrets from Vault:
         # - The name of the secret is any unique string after vault.hashicorp.com/agent-inject-secret-<name>
         # - The value is the path in Vault where the secret is located.
         vault.hashicorp.com/agent-inject-secret-microservices-secret-dev: abc123-nonprod/microservices-secret-dev
-        # Configures the template Vault Agent should use for rendering a secret:
+        # - The template Vault Agent should use for rendering a secret:
         vault.hashicorp.com/agent-inject-template-microservices-secret-dev: |
           {{- with secret "abc123-nonprod/microservices-secret-dev" }}
           export dev_database_host="{{ .Data.data.dev_database_host }}"
           export dev_database_name="{{ .Data.data.dev_database_name }}"
           {{- end `}} }}
 
-        # This is another sample. This set uses some HELM chart variable replacements. There's a bit of magic with the ` symbol in the agent-inject-template section. It also required some additional braces {}. You can use this as an example of what worked for me.
+        # - This is another sample. This set uses some HELM chart variable replacements. There's a bit of magic with the ` symbol in the agent-inject-template section. It also required some additional braces {}. You can use this as an example of what worked for me.
         vault.hashicorp.com/agent-inject-secret-microservices-secret-debug: {{ .Values.global.licenseplate }}-{{ .Values.global.vault_engine }}/microservices-secret-debug
         vault.hashicorp.com/agent-inject-template-microservices-secret-debug: |
           {{`{{- with secret `}}"{{ .Values.global.licenseplate }}-{{ .Values.global.vault_engine }}/microservices-secret-debug"{{` }}
@@ -107,14 +107,28 @@ spec:
           export dev_toolbox="{{ .Data.data.dev_toolbox }}"
           {{- end `}} }}
     spec:
+      # 2. Service Account
       serviceAccountName: abc123-vault
       # or for HELM with var replacements use:
       #serviceAccountName: {{ .Values.global.licenseplate }}-vault
 
+      # 3. how to use the secret:
+      containers:
+        - name: app
+          args:
+          ['sh', '-c', 'source /vault/secrets/microservices-secret-dev && <entrypoint_script>']
+          ...
+          ...
 ```
 
 ## Vault Service Account:
 
-Note the additional line under spec that I added. This is the service account that is needed to connect to the Vault. This account has been created already for you in Openshift so on the surface it's straight forward.
+Note the additional line under spec with `2. Service Account`. This is the service account that is needed to connect to the Vault. This account has been created already for you in Openshift so on the surface it's straight forward.
 
-There's a issue to be aware of with using this service account (SA): your application container will also use this SA to pull images and for management. So if you are using an image from tools namespace, make sure to add an ImagePuller rolebinding to the SA. If you are using Artifactory, add the image pull secret to the SA.
+There's a issue to be aware of with using this service account (SA): your application container will also use this SA to pull images and for management. So if you are using an image from tools namespace, make sure to add an ImagePuller rolebinding to the SA. If you are using Artifactory, add the imagePullSecrets to either the SA or the deployment spec.
+
+## How to use secrets in application container:
+
+The Vault init container will create local files with the secret key-value pairs pulled from Vault server. They are saved at the path `/vault/secrets/<name>` where name is the secret name you specified in the annotation above. Unlike OpenShift secrets (which is not recommended as they are only encoded but not encrypted), they are not presented to app containers as environment variables directly. You will have to source the secret files first! See `3. how to use the secret` from the above example.
+
+> Note: there are different ways to use the secrets, check out [more examples here](https://www.vaultproject.io/docs/platform/k8s/injector/examples#vault-agent-injector-examples).
