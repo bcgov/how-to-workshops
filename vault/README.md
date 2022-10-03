@@ -1,22 +1,143 @@
-# BC Government implementation guide for using DevExchange "Vault" Service
+---
+description: Vault - Getting Started Guide
+tags:
+- security
+- vault
+---
 
-The DevExchange group provisions a Hashicorp Vault for each Openshift (OC4) Project Set (licensepate-dev/test/prod/tools - eg: abc123-dev, abc123-test, abc123-prod, abc123-tools).
+# Vault - Getting Started Guide
 
-To start, you need to have permissions to use the Vault. Two users, the "Product Owner" and the "Tech Lead", are assigned during the [creation of the Openshift Project Set](https://registry.developer.gov.bc.ca/). These same users are granted admin permissions of the licenseplate Vault. Within the Vault service the only people who are able to grant additional permissions is the Platform Services team. Neither the Product Owner nor the Tech Lean have rights to alter roles. Due to license limitation, a maximum of three users are allowed per project set, including PO and two TLs. For special use cases, best method to get additional technical resources (eg: Devops Engineers) is to ask the owner to post a request in the [#devops-vault RocketChat channel](https://chat.developer.gov.bc.ca/channel/devops-vault). As of the time of writing, users do not have permissions to create additional secret engines. You must therefore organize your secrets into the pre-allocated secret engines. This constraint may cause issues if your secrets have the same name throughout the different namespaces.
+The Platform Services team has deployed Hashicorp's Vault application with disaster recovery in our Gold service clusters (Gold Kamloops and Gold Calgary), the service is available to all BC Government Development Teams on **both** the Silver and Gold service clusters. 
 
-[This wiki](https://github.com/BCDevOps/openshift-wiki/blob/master/docs/Vault/VaultGettingStarted.md) will help with getting you started on the Vault service side. There's more CLI on that page which can be very useful for diag and any automation you wish to incorporate.
+The Vault service is available at [https://vault.developer.gov.bc.ca/](https://vault.developer.gov.bc.ca/).
 
-To log into the vault service start here: [https://vault.developer.gov.bc.ca/](https://vault.developer.gov.bc.ca/)
+In this guide, you will learn how to access Vault and deploy a working example using sample secrets from your Vault Mount Points. Mount Points can be thought of as "MiniVaults" or related to paths within a linux filesystem that can be locked down and secured.
 
-To log in use the following values:
+## Table of Contents
 
-- Namespace: platform-services
-- Method: OIDC
-- Role: {LicensePlate}  (eg: abc123) (Note: No need for the dev/test/prod suffix)
+- [Vault - Getting Started Guide](#vault---getting-started-guide)
+  - [Table of Contents](#table-of-contents)
+  - [Access](#access)
+    - [User Access](#user-access)
+      - [Vault UI](#vault-ui)
+      - [Vault CLI](#vault-cli)
+    - [Kuberenetes Service Account Access](#kuberenetes-service-account-access)
+      - [Kubernetes Authentication Test](#kubernetes-authentication-test)
+  - [Support](#support)
+  - [References](#references)
 
-It will then prompt you to authorize with your Github account.
+## Access
 
-Once you've authenticated to your vault you will see 3 secret engines. `{licenseplate}-nonprod`, `{licenseplate}-prod` and `cubbyhole`. Your prod namespace has its own secret engine, while your tools, dev and test namespaces will share the nonprod secret engine as the naming suggests. The cubbyhole secret engine was not used in our environment.
+There are two types of access, User Access and Kubernetes Service Account (KSA) Access. User Access gives authorized users the ability to write secrets, while KSA Access only provides read access.
+
+### User Access
+
+User Access is controlled through a combination of RedHat Single-Sign On (Keycloak) and automation integrated with the [Platform Services Registry]((https://registry.developer.gov.bc.ca/)).
+
+For each Openshift Project Set (LICENSE_PLATE-dev/test/prod/tools - eg: abc123-dev, abc123-test, abc123-prod, abc123-tools), up to two Technical Contacts  would be grant access to Vault due to license limitation. These technical contacts will be given write access to the Mount Points set up by the registry.
+
+#### login to Vault UI
+
+1. Head over to <https://vault.developer.gov.bc.ca/>
+
+2. Enter `platform-services` for the **Namespace**
+
+3. Select `OIDC` for the **Method**
+
+4. Enter your `LICENSE_PLATE` for the **Role** (example uses `abc123` as the `LICENSE_PLATE`)
+
+5. Click **Sign In** and login with github through SSO
+
+![vault-login.gif](assets/gifs/vault-login.gif)
+
+#### login to Vault CLI
+
+1. Set Environment Variables
+
+    > please replace `abc123` with your project set license plate
+
+    ```bash
+    export LICENSE_PLATE=abc123
+    export VAULT_NAMESPACE=platform-services
+    export VAULT_ADDR=https://vault.developer.gov.bc.ca
+    ```
+
+2. Login
+
+    ```console
+    ❯ vault login -method=oidc role=abc123
+    Complete the login via your OIDC provider. Launching browser to:
+
+        https://oidc.gov.bc.ca/auth/realms/...
+    ```
+
+3. Sign in with OIDC
+
+4. Go back to the terminal
+
+    ```console
+    Success! You are now authenticated. The token information displayed below
+    is already stored in the token helper. You do NOT need to run "vault login"
+    again. Future Vault requests will automatically use this token.
+
+    Key                    Value
+    ---                    -----
+    token                  <token>
+    token_accessor         <string>
+    token_duration         768h
+    token_renewable        true
+    token_policies         ["default" "abc123"] # 'abc123' == $LICENSE_PLATE
+    identity_policies      []
+    policies               ["default" "abc123"] # 'abc123' == $LICENSE_PLATE
+    token_meta_email       justin@**********
+    token_meta_role        abc123 # 'abc123' == $LICENSE_PLATE
+    token_meta_username    j-pye@github
+    ```
+
+5. Test it out!
+
+Once authenticated to Vault you will see three secret engines:
+- `$LICENSE_PLATE-nonprod`
+- `$LICENSE_PLATE-prod`
+- `cubbyhole`
+
+The prod secret engine can be used for production namespace. While tools, dev and test namespaces will share the nonprod secret engine as the naming suggests. The cubbyhole secret engine was not used in our environment.
+
+Each secret engine has been provisioned with a sample `helloworld` secret. Confirm those can be read with the following commands:
+
+- nonprod
+    ```console
+    ❯ vault kv get $LICENSE_PLATE-nonprod/helloworld
+    ====== Metadata ======
+    Key              Value
+    ---              -----
+    created_time     2021-11-03T17:34:48.876436495Z
+    deletion_time    n/a
+    destroyed        false
+    version          3
+
+    ==== Data ====
+    Key      Value
+    ---      -----
+    hello    world
+    ```
+
+- prod
+    ```console
+    ❯ vault kv get $LICENSE_PLATE-prod/helloworld
+    ====== Metadata ======
+    Key              Value
+    ---              -----
+    created_time     2021-10-26T14:35:30.568419117Z
+    deletion_time    n/a
+    destroyed        false
+    version          1
+
+    ==== Data ====
+    Key      Value
+    ---      -----
+    hello    world
+    ```
 
 We organized our secrets as follows:
 
