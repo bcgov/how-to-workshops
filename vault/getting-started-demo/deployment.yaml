@@ -23,7 +23,6 @@ spec:
           {{ .Data.data.hello }}
           {{ end }}
         vault.hashicorp.com/agent-inject-token: 'true'
-        # this makes sure the secret vault will only change during pod restart:
         vault.hashicorp.com/agent-pre-populate-only: 'true'
         vault.hashicorp.com/auth-path: auth/k8s-CLUSTER
         vault.hashicorp.com/namespace: platform-services
@@ -45,7 +44,6 @@ spec:
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       serviceAccountName: LICENSE-vault
-      serviceAccount: LICENSE-vault
       securityContext: {}
       schedulerName: default-scheduler
   strategy:
