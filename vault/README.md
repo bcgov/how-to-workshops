@@ -15,17 +15,18 @@ In this guide, you will learn how to access Vault and deploy a working example u
 
 ## Table of Contents
 
-- [Vault - Getting Started Guide](#vault---getting-started-guide)
-  - [Table of Contents](#table-of-contents)
-  - [Access](#access)
-    - [User Access](#user-access)
-      - [login to Vault UI](#vault-ui)
-      - [login via Vault CLI](#vault-cli)
-      - [Verify your Vault resources](#verify-your-vault-resources)
-    - [Kubernetes Service Account Access](#kubernetes-service-account-access)
-      - [Sample Deployment using the Kubernetes Service Account](#kubernetes-authentication-test)
-  - [Support](#support)
-  - [References](#references)
+* [Vault - Getting Started Guide](#vault---getting-started-guide)
+   * [Table of Contents](#table-of-contents)
+   * [Access](#access)
+      * [User Access - Manage Vault Secret Resources](#user-access)
+         * [login to Vault UI](#vault-ui)
+         * [login to Vault CLI](#vault-cli)
+         * [Verify your Vault resources](#verify-your-vault-resources)
+      * [Kubernetes Service Account Access - Application Secret Usage](#kubernetes-service-account-access)
+         * [Vault Secret Structures](#vault-secret-structures)
+         * [Sample Deployment using the Kubernetes Service Account](#sample-deployment-using-the-kubernetes-service-account)
+   * [Support](#support)
+   * [References](#references)
 
 ## Access
 
@@ -144,10 +145,18 @@ Each secret engine has been provisioned with a sample `helloworld` secret. Confi
     hello    world
     ```
 
+### Kubernetes Service Account Access
+
+Kubernetes Service Account (KSA) Access is configured using k8s authentication. Vault is configured with a unique k8s auth path for each cluster that has Vault enabled.
+
+The Vault KSA name takes the form of `$LICENSE_PLATE-vault` in all project set namespaces. This service account should be used for the Resource that will control your pods (from Deployments, StatefulSets, etc). Additional Roles can be Bound to this KSA through a RoleBinding with the desired Role if application requires it.
+
+#### Vault Secret Structures
+
 We organized our secrets as follows:
 
 ```
-{licenseplate}-nonprod                  #secret engine
+$LICENSE_PLATE-nonprod                  #secret engine
 - |---microservices-secret-dev          #secret name
 -     |---dev_database_host             #secret data
 -     |---dev_database_name             #secret data
@@ -164,7 +173,7 @@ We organized our secrets as follows:
 -     |---test_service_account          #secret data
 -     |---test_service_account_pass     #secret data
 
-{licenseplate}-prod                     #secret engine
+$LICENSE_PLATE-prod                     #secret engine
 - |---microservices-secret-prod         #secret name
 -     |---prod_database_host            #secret data
 -     |---prod_database_name            #secret data
@@ -174,13 +183,14 @@ We organized our secrets as follows:
 
 > NOTE: Don't use a hyphen in a "key".  Vault will accept the value but it's problematic in the Openshift templates which shows up as an error in the vault-init container.
 
-# Usage of the Vault secrets in Openshift.
+#### Sample Deployment using the Kubernetes Service Account
 
-When you look at the getting-started-demo you'll see there's already a deployment template to assist. The two important parts of this vault demo are:
-- `annotations`
-- `serviceaccount`
+When you look at the [getting-started-demo](./getting-started-demo/README.md) you'll see there's already a deployment template to assist. The three important parts of this vault demo are:
+- part 1 - `annotations`
+- part 2 - `serviceaccount`
+- part 3 - source secret file
 
-## Annotation
+**Part 1 - Annotation**
 We elected to use the annotation / Vault Agent Injector method. [This was helpful from Hashicorp](https://www.vaultproject.io/docs/platform/k8s/injector/examples).
 
 In the following example, it contains the minimum configuration needed for Vault init container to work. If you are looking for advanced configurations, such as vault init container resource config and so on, options can be found from the [annotation doc](https://www.vaultproject.io/docs/platform/k8s/injector/annotations)!
@@ -247,14 +257,23 @@ spec:
           ...
 ```
 
-## Vault Service Account:
+**Part 2 - Vault Service Account**
 
 Note the additional line under spec with `2. Service Account`. This is the service account that is needed to connect to the Vault. This account has been created already for you in Openshift so on the surface it's straight forward.
 
 There's a issue to be aware of with using this service account (SA): your application container will also use this SA to pull images and for management. So if you are using an image from tools namespace, make sure to add an ImagePuller rolebinding to the SA. If you are using Artifactory, add the imagePullSecrets to either the SA or the deployment spec.
 
-## How to use secrets in application container:
+**Part 3 - How to use secrets in application container**
 
 The Vault init container will create local files with the secret key-value pairs pulled from Vault server. They are saved at the path `/vault/secrets/<name>` where name is the secret name you specified in the annotation above. Unlike OpenShift secrets (which is not recommended as they are only encoded but not encrypted), they are not presented to app containers as environment variables directly. You will have to source the secret files first! See `3. how to use the secret` from the above example.
 
 > Note: there are different ways to use the secrets, check out [more examples here](https://www.vaultproject.io/docs/platform/k8s/injector/examples#vault-agent-injector-examples).
+
+## Support
+
+Support is provided via the [#devops-vault](https://chat.developer.gov.bc.ca/channel/devops-vault) channel in RocketChat!
+
+## References
+
+- [Vault KV2 Usage - Official](https://www.vaultproject.io/docs/secrets/kv/kv-v2#usage)
+- [Vault Annotations - Official](https://www.vaultproject.io/docs/platform/k8s/injector/annotations)
