@@ -19,24 +19,29 @@ In this guide, you will learn how to access Vault and deploy a working example u
   - [Table of Contents](#table-of-contents)
   - [Access](#access)
     - [User Access](#user-access)
-      - [Vault UI](#vault-ui)
-      - [Vault CLI](#vault-cli)
-    - [Kuberenetes Service Account Access](#kuberenetes-service-account-access)
-      - [Kubernetes Authentication Test](#kubernetes-authentication-test)
+      - [login to Vault UI](#vault-ui)
+      - [login via Vault CLI](#vault-cli)
+      - [Verify your Vault resources](#verify-your-vault-resources)
+    - [Kubernetes Service Account Access](#kubernetes-service-account-access)
+      - [Sample Deployment using the Kubernetes Service Account](#kubernetes-authentication-test)
   - [Support](#support)
   - [References](#references)
 
 ## Access
 
-There are two types of access, User Access and Kubernetes Service Account (KSA) Access. User Access gives authorized users the ability to write secrets, while KSA Access only provides read access.
+There are two types of access to manage secrets on Vault,
+- User Access
+- Kubernetes Service Account (KSA) Access
+
+User Access gives authorized users the ability to create and write secrets, while KSA Access only provides read access, which is used for application pods to full secret values from Vault.
 
 ### User Access
 
 User Access is controlled through a combination of RedHat Single-Sign On (Keycloak) and automation integrated with the [Platform Services Registry]((https://registry.developer.gov.bc.ca/)).
 
-For each Openshift Project Set (LICENSE_PLATE-dev/test/prod/tools - eg: abc123-dev, abc123-test, abc123-prod, abc123-tools), up to two Technical Contacts  would be grant access to Vault due to license limitation. These technical contacts will be given write access to the Mount Points set up by the registry.
+For each Openshift Project Set ($LICENSE_PLATE-dev/test/prod/tools - eg: abc123-dev, abc123-test, abc123-prod, abc123-tools), up to two Technical Contacts would be grant access to Vault due to license limitation. These technical contacts will be given write access to the Mount Points set up by the registry.
 
-#### login to Vault UI
+#### Vault UI
 
 1. Head over to <https://vault.developer.gov.bc.ca/>
 
@@ -50,7 +55,7 @@ For each Openshift Project Set (LICENSE_PLATE-dev/test/prod/tools - eg: abc123-d
 
 ![vault-login.gif](assets/gifs/vault-login.gif)
 
-#### login to Vault CLI
+#### Vault CLI
 
 1. Set Environment Variables
 
@@ -94,16 +99,16 @@ For each Openshift Project Set (LICENSE_PLATE-dev/test/prod/tools - eg: abc123-d
     token_meta_username    j-pye@github
     ```
 
-5. Test it out!
+#### Verify your Vault resources
 
 Once authenticated to Vault you will see three secret engines:
-- `$LICENSE_PLATE-nonprod`
 - `$LICENSE_PLATE-prod`
+- `$LICENSE_PLATE-nonprod`
 - `cubbyhole`
 
 The prod secret engine can be used for production namespace. While tools, dev and test namespaces will share the nonprod secret engine as the naming suggests. The cubbyhole secret engine was not used in our environment.
 
-Each secret engine has been provisioned with a sample `helloworld` secret. Confirm those can be read with the following commands:
+Each secret engine has been provisioned with a sample `helloworld` secret. Confirm those can be read either by viewing the secret value or with the following commands:
 
 - nonprod
     ```console
