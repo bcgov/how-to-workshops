@@ -18,3 +18,5 @@ If you want to connect to PGO from your local workstation use these steps.
 PG_CLUSTER_PRIMARY_POD=$(oc get pod -n -o name -l postgres-operator.crunchydata.com/cluster=,postgres-operator.crunchydata.com/role=master)
 oc -n ae3cec-dev port-forward "${PG_CLUSTER_PRIMARY_POD}" 5432:5432
 ```
+or via the service using pgbouncer, for example:
+oc -n ae3cec-dev port-forward service/crunchy-db-pgbouncer 15436:5432
