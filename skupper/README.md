@@ -10,6 +10,7 @@ Skupper lets you connect services in multiple OpenShift cluster together with Mu
   - [Create a Backend Service to be Accessed](#create-a-backend-service-to-be-accessed)
   - [Create a Frontend Service](#create-a-frontend-service)
   - [Test the app](#test-the-app)
+  - [Set up a Linux VM as a Site](#set-up-a-linux-vm-as-a-site)
   - [Additional Resources](#additional-resources)
 
 ## Install the CLI
@@ -96,6 +97,12 @@ When initiating the site we also need to add the DataClass label for the pods to
 
 ```bash
 skupper init --create-network-policy --labels DataClass=Medium --site-name emerald --routers 2
+```
+
+Label the routes that are created
+
+```bash
+oc annotate route --all aviinfrasetting.ako.vmware.com/name=dataclass-medium
 ```
 
 ## Create a Connection Token
@@ -189,6 +196,60 @@ oc expose service hello-world-frontend
 ## Test the app
 
 Connect to the route of the frontend app in your browser. Click on the "Say hello" button, and you should get a message below back from the backend service.
+
+## Set up a Linux VM as a Site
+
+Get a RHEL 9 VM that can access your backend service as well as the Route of one of your other Skupper Sites.
+
+Have the Linux team install some packages for you and set up your user/service account to run Podman.
+
+```bash
+sudo dnf install podman netavark
+sudo loginctl enable-linger someuser_a
+sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 someuser_a
+```
+
+Log in as your user and set up podman
+
+```bash
+systemctl --user start podman.socket
+mkdir .local/bin -p
+tar zxvf skupper-cli-1.4.1-linux-amd64.tgz -C .local/bin/
+podman network create skupper
+```
+
+If you VM can connect to the internet, it will be able to pull down the Skupper podman image. If not, then import the image to your namespace and pull it from there.
+
+```bash
+# In your namespace
+oc tag quay.io/skupper/skupper-router:2.4.1 ce9012-test/skupper-router:2.4.1 --scheduled
+oc create token default # this will give the "password" to log into the image registry with
+# On your VM
+export SKUPPER_IMAGE_REGISTRY=image-registry.apps.silver.devops.gov.bc.ca/ce9012-test
+podman login -u serviceaccount image-registry.apps.silver.devops.gov.bc.ca
+# supply the token from above
+```
+
+Now we can set up the Skupper Site on the VM
+
+```bash
+skupper switch podman
+skupper init --ingress none --container-network skupper
+```
+
+Then we expose the service from this site. The IP can be the local VM, or another IP this VM can reach such as a DB server.
+
+```bash
+skupper expose host 142.x.x.x --address foobla --port 80
+```
+
+Then back in your namespace, add the service to the Skupper network
+
+```bash
+skupper service create foobla 80
+```
+
+Now, from any of the namespaces in the Skupper network, you can connect to the new service.
 
 ## Additional Resources
 
