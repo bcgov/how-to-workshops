@@ -1,6 +1,7 @@
 # Skupper
 
-Skupper lets you connect services in multiple OpenShift cluster together with MutualTLS. You can also connect to Linux hosts running Skupper via Podman. All the communication is done via port 443, and can flow over forward proxy servers. Only one Skupper Site needs to be accessable by the rest for data to flow.
+Skupper lets you connect services in multiple OpenShift clusters together with MutualTLS. You can also connect to Linux hosts running Skupper via Podman. All the communication is done via port 443, and can flow over forward proxy servers. Only one Skupper Site needs to be accessable by the rest for data to flow.
+
 
 - [Skupper](#skupper)
   - [Install the CLI](#install-the-cli)
