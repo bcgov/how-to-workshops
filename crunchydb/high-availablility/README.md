@@ -12,6 +12,33 @@ In this example, my license plate is `be1c6b`.
 
 `PostgresCluster` has the sample PostgresCluster with 3 replicas, backups, and monitoring.
 
+## Images
+
+The PostgresCluster should include the version specifications for PostgreSQL and if required PostGIS. The reference to the image should always be specified to ensure that it can be found.
+
+```
+spec:
+  postgresVersion: 15
+  postGISVersion: "3.3"
+  image: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-postgres-gis:ubi8-15.2-3.3-0
+  imagePullPolicy: IfNotPresent
+```
+
+The following images are available in the artifacts.developer.gov.bc.ca/bcgov-docker-local image repository.
+
+* Postgres
+    * 13 ?????
+    * 14
+        * crunchy-postgres:ubi8-14.7-0
+        * crunchy-postgres-gis:ubi8-14.7-3.1-0 (3.2-0 or (3.3-0))
+    * 15
+        * crunchy-postgres-gis:ubi8-15.2
+        * crunchy-postgres-gis:ubi8-15.2-3.3-0
+* PGAdmin: crunchy-pgadmin4:ubi8-4.30-10
+* PGBackRest: crunchy-pgbackrest:ubi8-2.41-4
+* PGBouncer: crunchy-pgbouncer:ubi8-1.18-0
+* PGExporter: crunchy-postgres-exporter:ubi8-5.3.1-0
+
 ## Monitoring Sidecar
 
 The monitoring side car is added like this.
