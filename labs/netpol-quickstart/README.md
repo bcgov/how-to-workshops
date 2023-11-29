@@ -2,19 +2,19 @@
 
 This lab contains the quick start material that will get your environment up and running with the KNP.
 
-* [OpenShift SDN](https://docs.openshift.com/container-platform/4.6/networking/openshift_sdn/about-openshift-sdn.html)
+- [OpenShift SDN](https://docs.openshift.com/container-platform/4.6/networking/openshift_sdn/about-openshift-sdn.html)
 
-* [OpenShift NetworkPolicy](https://docs.openshift.com/container-platform/4.6/networking/network_policy/about-network-policy.html#about-network-policy)
+- [OpenShift NetworkPolicy](https://docs.openshift.com/container-platform/4.6/networking/network_policy/about-network-policy.html#about-network-policy)
 
-* [Kubernetes NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+- [Kubernetes NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
 # Prologue
 
- Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. Openshift 4 Built-In Software Defined Network (SDN) has been implemented to control network security for all apps hosted on the Private Cloud Openshift Platform. 
+Back in 2019 we decided to take a strong stance on security and, by way of a security focused project, began implementing several tools to make our OpenShift Container Platform (OCP) a leader in this respect. Openshift 4 Built-In Software Defined Network (SDN) has been implemented to control network security for all apps hosted on the Private Cloud Openshift Platform.
 
 # Introduction
 
-Developers interact with the Openshift 4 Build-In SDN through the use of Kubernetes Network Policies (KNPs) objects that allow to specify network security rule declaratively within each namespace and down to the pod level. **All projects first provisioned on the Platform have "Zero-Trust" network security enabled by default** which means that all communications from and within the project namespaces are shutdown except for those that are explicitely allows in the KNPs.  This guide will walk you through implementing the quick start Network Policy (KNP) to unblock basic communications within a namespace. While this will be enough to your project up-and-running we **strongly** recommend rolling out more robust NPs to ensure your environment(s) are as secure as they can be. Further workshops will expand on this subject. 
+Developers interact with the Openshift 4 Build-In SDN through the use of Kubernetes Network Policies (KNPs) objects that allow to specify network security rule declaratively within each namespace and down to the pod level. **All projects first provisioned on the Platform have "Zero-Trust" network security enabled by default** which means that all communications from and within the project namespaces are shutdown except for those that are explicitely allows in the KNPs. This guide will walk you through implementing the quick start Network Policy (KNP) to unblock basic communications within a namespace. While this will be enough to your project up-and-running we **strongly** recommend rolling out more robust NPs to ensure your environment(s) are as secure as they can be. Further workshops will expand on this subject.
 
 Read more about [the KNPs features](https://docs.openshift.com/container-platform/4.8/networking/network_policy/about-network-policy.html) supported in the current version of the OpenShift (v4.8) on the Platform. Note that the support for egress rules and ipBlock rules have only become available in OCP 4.8.
 
@@ -24,16 +24,15 @@ Before we dive into the quick start policies, lets go over a few important detai
 
 ### Egress Rules
 
-With the quick start KNP in place pods will be able to connect to other pods within their namespace, in other namespaces, or to external systems (outside of the cluster). 
-
+With the quick start KNP in place pods will be able to connect to other pods within their namespace, in other namespaces, or to external systems (outside of the cluster).
 
 Projects that require cross-namespace communication should reach out to the Platform Services Teams in Rocketchat ; these policies can be implemented, as needed, by a cluster administrator.
 
 ### Default Zero-Trust KNP
 
-As product teams implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected. 
+As product teams implement network policy they are "rolling out" KNP; there is nothing Platform Services needs to do. Everything is in place and working as expected.
 
-One KNP  is installed by default in every namespaces provisioned by the Platform Project Registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later. This "deny-all" KNP enforces the Zero Trust model within the namespace and blocks all communications from and within the namespace.
+One KNP is installed by default in every namespaces provisioned by the Platform Project Registry and it cannot be removed; if you remove it a smart robot will just re-create it a few moments later. This "deny-all" KNP enforces the Zero Trust model within the namespace and blocks all communications from and within the namespace.
 
 ```console
 ➜  how-to-workshops git:(master) ✗ oc get netpol
@@ -51,7 +50,6 @@ The quick start policy builds on top of the existing `platform-services-controll
 2. Allow pods in the same namespace to communicate.
 
 Lets review the thee policies in more detail.
-
 
 ### Walled Garden
 
@@ -95,6 +93,7 @@ Having a route alone isn't enough to let traffic flow into your pods, you also n
 ```
 
 **Pro Tip 🤓**
+
 - Add labels to your KNP to easily find and delete them as a group. Check out [this sample application](https://github.com/bcgov/how-to-workshops/blob/master/labs/netpol-demo-project) that demonstrates the use of labels to make it easier to apply KNPs to the selected pods.
 - `podSelector: {}` is a wildcard, if you want additional piece of mind add a label like `route-ingress: true` to pods that can accept external traffic and use it in place of the wildcard.
 
@@ -112,14 +111,14 @@ Allowing pods to accept traffic from a route is great, and maybe that's enough f
     # to one another.
     podSelector:
     ingress:
-    - from:
-      - podSelector: {}
+      - from:
+          - podSelector: {}
 ```
 
 **Pro Tip 🤓**
+
 - Add labels to your KNP to easily find and delete them as a group.
 - Additional labs will cover writing targeted KNP so that, for example, only the API pod can talk to a database pod.
-
 
 ## Quick Start
 
@@ -129,22 +128,20 @@ There is an OCP template called [QuickStart](./quickstart.yaml) at the root leve
 oc get netpol
 ```
 
-When you are ready to apply the quick start policy above run the following command passing in the two required parameters described below:
+When you are ready to apply the quick start policy above run the following command. Note this is not an OpenShift template so you must be in the correct namespace or use the `-n` to specify one:
 
 ```console
-oc process -f quickstart.yaml \
- -p NAMESPACE=<NAMESPACE_NAME_HERE> | \
- oc apply -f -
+oc apply -f quickstart.yaml -n NAMESPACE
 ```
 
-| Parameter    | Description         |
-| :----------- | :------------------ |
-| NAMESPACE    | The namespace you are deploying this policy to. |
+| Parameter | Description                                     |
+| :-------- | :---------------------------------------------- |
+| NAMESPACE | The namespace you are deploying this policy to. |
 
 Here is what the command should look like when run:
 
 ```console
-➜  netpol-quickstart git:(main) ✗ oc process -f quickstart.yaml NAMESPACE -p $(oc project --short) | oc apply -f -
+➜  netpol-quickstart git:(main) ✗ oc apply -f quickstart.yaml -n $(oc project --short)
 networkpolicy.networking.k8s.io/allow-same-namespace created
 networkpolicy.networking.k8s.io/allow-all-internal created
 ```
@@ -165,14 +162,13 @@ timeout 5 bash -c "</dev/tcp/api/8080"; echo $?
 
 ![How To Test](images/how-to-test.png)
 
-
-| Item | Description |
-| :--- | :---------- |
-| A    | The protocol to use, `tcp` or `udp` |
-| B    | The `service` or pod name as shown by `oc get service` or `oc get pods` |
-| C    | The port number exposed by the Pod |
+| Item | Description                                                                                                                                    |
+| :--- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| A    | The protocol to use, `tcp` or `udp`                                                                                                            |
+| B    | The `service` or pod name as shown by `oc get service` or `oc get pods`                                                                        |
+| C    | The port number exposed by the Pod                                                                                                             |
 | D    | The return code of the command: `0` means the pods can communicate, while `124` means the pods cannot communicate on the given protocol / port |
-| E    | The delay in seconds the command will wait before failing |
+| E    | The delay in seconds the command will wait before failing                                                                                      |
 
 ## Need More Help?
 
